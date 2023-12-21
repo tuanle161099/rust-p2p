@@ -19,7 +19,9 @@
 // DEALINGS IN THE SOFTWARE.
 
 use futures::stream::StreamExt;
-use libp2p::{gossipsub, mdns, noise, swarm::NetworkBehaviour, swarm::SwarmEvent, tcp, yamux};
+use libp2p::{
+    gossipsub, mdns, noise, swarm::NetworkBehaviour, swarm::SwarmEvent, tcp, yamux, Multiaddr,
+};
 use std::collections::hash_map::DefaultHasher;
 use std::error::Error;
 use std::hash::{Hash, Hasher};
@@ -88,6 +90,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // Listen on all interfaces and whatever port the OS assigns
     swarm.listen_on("/ip4/0.0.0.0/udp/0/quic-v1".parse()?)?;
     swarm.listen_on("/ip4/0.0.0.0/tcp/0".parse()?)?;
+
+    let node_b_address: Multiaddr = "/ip4/10.210.17.4/tcp/44355"
+        .parse()
+        .expect("Invalid address");
+    swarm.dial(node_b_address)?;
 
     println!("Enter messages via STDIN and they will be sent to connected peers using Gossipsub");
 
